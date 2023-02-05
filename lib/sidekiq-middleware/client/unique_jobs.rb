@@ -5,7 +5,8 @@ module Sidekiq
         def call(worker_class, item, queue, redis_pool = nil)
           begin
             worker_class = worker_class.constantize if worker_class.is_a?(String)
-            enabled = Sidekiq::Middleware::Helpers.unique_enabled?(worker_class, item)
+            enabled = ENV['SIDEKIQ_MIDDLEWARE_SKIP_UNIQUE_CHECKS'].blank? &&
+              Sidekiq::Middleware::Helpers.unique_enabled?(worker_class, item)
           rescue NameError
             enabled = false
           end
